@@ -5,7 +5,7 @@
 
 .. include:: docs/SharedExclusion/substitutions.rst
 
-|SharedExclusion|
+SharedExclusion
 =======================================================================================
 
 .. toctree::
