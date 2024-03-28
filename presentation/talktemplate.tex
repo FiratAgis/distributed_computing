@@ -53,8 +53,8 @@
 %  {John Doe \& Jane Doe}
 %}
 
-\title[WINS Beamer Template]{WINS Lab Beamer Presentation Template}
-\subtitle[Short SubTitle]{How to Prepare a Nice Presentation}
+\title[WINS Beamer Template]{Implementing Mutual Exclusion in Shared Memory}
+\subtitle[Short SubTitle]{Peterson's and Bakery Algorithma}
 %\date{} 
 
 \begin{document}
@@ -127,7 +127,7 @@ The audience will remember at most one single message \textbf{Which message you 
 \begin{frame}
 \frametitle{Motivation/Importance}
 \framesubtitle{``Gain upon solving the problem, pain if not solved'' should be explained}
-Explain why the problem is so important. Throw in a little philosophy if necessary. How does the problem fit into the larger picture? If it involves a model of a real-world phenomenon, then how good is the model? What are its applications? What makes the problem nontrivial? You can return to these issues in the Conclusion, when you can re-address them with the benefit of hindsight.
+Disturbed systems with many process, while working on the same data, it is common for many processes to want to access or modify it at the same time. But a process changing the data while the other is reading it might create unwanted effects. Mutual exclusion is a common way of handling these effects. This enables multiple processes to work on the same piece of data, which is one of the most fundamental capabilities requested from a distributed system.
 \end{frame}
 
 \section{Background/Model/Definitions/Previous Works}
@@ -138,9 +138,11 @@ Explain why the problem is so important. Throw in a little philosophy if necessa
 \frame{
 \frametitle{Model, Definitions}
 \framesubtitle{Formal definition of a Stochastic Process}
-The use of terminology and jargon should be kept to a minimum, but is impossible to avoid entirely. All terms must be introduced early. It is also useful to remind the audience of the definitions at critical points later in the talk.
+When a process wants to modify a piece of data that is being accessed by others, it creates a \textbf{race condition}. 
 
-Background and this slide can be combined....
+Regions of code that modifies the shared memory, meaning regions that might cause race conditions are called the \textbf{critical section}.
+
+\textbf{Mutual exclusion} is the methodology of allowing only a single process to enter a critical section at a time.
 }
 
 \subsection{Background, Previous Works}
@@ -149,58 +151,83 @@ Research is not usually carried out in a vacuum. There will almost always be oth
 \end{frame}
 
 
-
-
 \section{Contribution}
-\subsection{Main Point 1}
-\begin{frame}{Main Point 1: A Figure}
-\framesubtitle{Abstract the Major Results}
-Describe the key results of the paper. You may present the statements of the major theorems, but not their proofs. You will probably have to get a little technical here, but do so gradually and carefully.
+\subsection{Peterson's Algorithm}
+\begin{frame}{SharedExclusion Algorithm 1}
+\framesubtitle{Peterson's Algorithm}
+Peterson's Algorithm \cite{Peterson_1981} prevents 2 processes from entering the critical section in the same time. It achieves this by a way of each process giving way to other. When the process comes to the critical section, it first allows the other process to continue to the critical section and only moves forward if the other is not currently trying to enter the critical section or if the other process finishes its work within the critical section. While it is a gentleman's way of handling shared memory exclusion, its main limitation lies in the fact that it only works for 2 processes.
+\end{frame}
 
-\begin{figure}
-    \centering
-    \includegraphics[scale=0.5]{figures/Chick1.png}
-    \caption{Awesome Image}
-    \label{fig:awesome_image}
-\end{figure}
-\note{
-}
+\begin{frame}{SharedExclusion Algorithm 1}
+\framesubtitle{Peterson's Algorithm}
+\begin{algorithm}[H]
+	\scriptsize
+	\def\algorithmlabel{Peterson's}
+    \caption{\algorithmlabel\ algorithm}
+    \label{alg:peterson}
+    \KwData{Processes $p_i$ where $i \in \lbrace 0, 1 \rbrace$}
+    initialization\;
+    $\texttt{turn} \leftarrow \false $\;
+    $\texttt{waiting}[2]$\;
+    \BlankLine
+    algorithm\;
+    \If{$p_i$ wants to enter \textbf{CS}}{
+    	$\texttt{waiting}[i] \leftarrow \true$\;
+    	$\texttt{turn} \leftarrow 1 - i$\;
+    	\BlankLine
+    	\lWhile{$waiting[1 - i] = \true$ and $turn = 1-i$}{no-op}
+    	\BlankLine
+    	$p_i$ enters \textbf{CS};
+    	\BlankLine
+    	$p_i$ exits \textbf{CS};
+    	\BlankLine
+    	$\texttt{waiting}[i] \leftarrow \false$\;
+    }
+
+\end{algorithm}
 \end{frame}
 
 
-\subsection{Main Point 2}
+\subsection{Bakery Algorithm}
 
 \begin{frame}
-\frametitle{An Example Distributed Algorithm}
-\framesubtitle{Blind Flooding}
+\frametitle{SharedExclusion Algorithm 2}
+\framesubtitle{Bakery Algorithm}
+Bakery Algorithm \cite{Lamport_1974} simulates the activity of waiting in a line in its namesake to get your order. Every process takes a ticket with a number on it. When their number flashes on the screen, they come and give their order. If two processes have the same number on their ticket, the conflict is resolved through seniority, just like letting an elderly person go before you when both of you arrive at the same time.
 
+\end{frame}
 
-Blind flooding on an undirected graph is presented in Algorithm~\ref{alg:blindflooding}.
-
-\begin{center}
+\begin{frame}{SharedExclusion Algorithm 2}
+\framesubtitle{Bakery Algorithm}
 \begin{algorithm}[H]
 	\scriptsize
-	\def\algorithmlabel{BlindFlooding}
+	\def\algorithmlabel{Bakery}
     \caption{\algorithmlabel\ algorithm}
-    \label{alg:blindflooding}
-    \begin{algorithmic}[1]
-    	\Implement {\algorithmlabel}{cf} 
-    	\Use {LinkLayerBroadcast} {lbc} 
-    	\Events{Init, MessageFromTop, MessageFromBottom}
-	\Need {}
+    \label{alg:bakery}
+    \KwData{Processes $p_i$ where $i \in [1,n]$}
+    initialization\;
+    $\texttt{entering}[n]$\;
+    $\texttt{ticket}[n]$\;
+    \BlankLine
+    algorithm\;
+    \If{$p_i$ wants to enter \textbf{CS}}{
+    	$\texttt{entering}[i] \leftarrow \true$\;
+    	$\texttt{ticket}[i] \leftarrow \max (\texttt{ticket}) + 1$\;
+    	$\texttt{entering}[i] \leftarrow \false$\;
+    	\BlankLine
+    	\For{$j \leftarrow 1$ \KwTo $n$}{
+    		\lWhile{$entering[j] = \true $}{no-op}
+    		\lWhile{$ticket[j] \neq 0$ and $(ticket[j],j)<(ticket[i],i)$}{no-op}
+    	}
+    	\BlankLine
+    	$p_i$ enters \textbf{CS};
+    	\BlankLine
+    	$p_i$ exits \textbf{CS};
+    	\BlankLine
+    	$\texttt{ticket}[i] \leftarrow 0$\;
+    }
 
-        \Event {Init}{}
-        		
-        \Event{MessageFromBottom} { $m$ }
-        		\Trig{lbc}{Broadcast} { $m$  }
-        		
-        \Event{MessageFromTop} { $m$ }	
-        		\Trig{lbc}{Broadcast} { $m$  }
-    \end{algorithmic}
 \end{algorithm}
-\end{center}
-
-
 \end{frame}
 
 \begin{frame}

@@ -6,11 +6,11 @@
 \beamer@subsectionintoc {4}{1}{Model, Definitions}{10}{0}{4}
 \beamer@subsectionintoc {4}{2}{Background, Previous Works}{11}{0}{4}
 \beamer@sectionintoc {5}{Contribution}{12}{0}{5}
-\beamer@subsectionintoc {5}{1}{Main Point 1}{13}{0}{5}
-\beamer@subsectionintoc {5}{2}{Main Point 2}{14}{0}{5}
-\beamer@subsectionintoc {5}{3}{Main Point 3}{16}{0}{5}
-\beamer@sectionintoc {6}{Experimental results/Proofs}{17}{0}{6}
-\beamer@subsectionintoc {6}{1}{Main Result 1}{18}{0}{6}
-\beamer@subsectionintoc {6}{2}{Main Result 2}{19}{0}{6}
-\beamer@subsectionintoc {6}{3}{Main Result 3}{20}{0}{6}
-\beamer@sectionintoc {7}{Conclusions}{21}{0}{7}
+\beamer@subsectionintoc {5}{1}{Peterson's Algorithm}{13}{0}{5}
+\beamer@subsectionintoc {5}{2}{Bakery Algorithm}{15}{0}{5}
+\beamer@subsectionintoc {5}{3}{Main Point 3}{18}{0}{5}
+\beamer@sectionintoc {6}{Experimental results/Proofs}{19}{0}{6}
+\beamer@subsectionintoc {6}{1}{Main Result 1}{20}{0}{6}
+\beamer@subsectionintoc {6}{2}{Main Result 2}{21}{0}{6}
+\beamer@subsectionintoc {6}{3}{Main Result 3}{22}{0}{6}
+\beamer@sectionintoc {7}{Conclusions}{23}{0}{7}

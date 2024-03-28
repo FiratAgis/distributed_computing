@@ -1,4 +1,4 @@
 \beamer@slide {toc<1>}{2}
 \beamer@slide {toc}{2}
-\beamer@slide {fig:awesome_image}{13}
-\beamer@slide {alg:blindflooding}{14}
+\beamer@slide {alg:peterson}{14}
+\beamer@slide {alg:bakery}{16}

@@ -3,7 +3,7 @@
 SharedExclusion
 =========================================
 
-In a regular systems with multiple processes or a disturbuted systems with many members (which we will also call processes for simplicity), while working on the same data, it is common for many processes to want to access or modify the same piece of data. But a process changing the data while the other is reading it might create unwanted effects. We call these race conditions, where two or more processes races to work on the same piece of memory. We call the regions of code that access or modify the same shared memory a critical section. Mutual exclusion in a shared memory is a common way of handling these race conditions, by forcing processes to enter critical sections in a mutually exclusive fashion. This enables multiple processes to work on the same piece of data, which enables us to run algorithms which process a piece of data in a concurent way.
+In a regular systems with multiple processes or a disturbed systems with many members (which we will also call processes for simplicity), while working on the same data, it is common for many processes to want to access or modify the same piece of data. But a process changing the data while the other is reading it might create unwanted effects. We call these race conditions, where two or more processes races to work on the same piece of memory. We call the regions of code that access or modify the same shared memory a critical section. Mutual exclusion in a shared memory is a common way of handling these race conditions, by forcing processes to enter critical sections in a mutually exclusive fashion. This enables multiple processes to work on the same piece of data, which enables us to run algorithms which process a piece of data in a concurrent way.
 
 Background and Related Work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -19,7 +19,7 @@ SharedExclusion is a collection of algorithms for mutual exclusion in shared dis
 Peterson's Algorithm
 """"""""""""""""""""""""
 
-Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ works for 2 processes, lets call them p_0 and p_1, and prevents both of them from entering the critical section in the same time. It achives this by a way of each process giving way to other. When the process comes to the critical section, it first allows the other process to continue to the critical section and only moves forward if the other is not currently trying to enter the critical section or if the other process finishes its work within the critical section. While it is a gentlemen's way of handling shared memory exclusion, its main limitation lies in the fact that it only works for 2 processes. This can be circumnavigated by a cascading giving way action for processes arranged in a binary tree but that will be explored later.
+Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ works for 2 processes, lets call them p_0 and p_1, and prevents both of them from entering the critical section in the same time. It achieves this by a way of each process giving way to other. When the process comes to the critical section, it first allows the other process to continue to the critical section and only moves forward if the other is not currently trying to enter the critical section or if the other process finishes its work within the critical section. While it is a gentleman's way of handling shared memory exclusion, its main limitation lies in the fact that it only works for 2 processes. This can be circumnavigated by a cascading giving way action for processes arranged in a binary tree but that will be explored later.
 
 .. _PetersonsAlgorithm:
 
@@ -87,7 +87,7 @@ Bakery :ref:`Algorithm <BakeryAlgorithm>` [Lamport1974]_ simulates the activity 
             
             p_i exits the critical section;
 			
-            ticket[i] = 0;
+            ticket[i] ← 0;
 			
         end if
 		
