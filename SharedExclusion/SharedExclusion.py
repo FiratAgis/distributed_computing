@@ -87,8 +87,22 @@ class SharedExclusionComponentModel(GenericModel):
 
     Extend SharedExclusionComponentModel to implement your own mutual exclusion algorithm.
     """
+    no_op_duration = 1.0
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
         """
         Initializes the SharedExclusionComponentModel
         """
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
+
+        self.clock = 0
+
+        self.otherNodeIDs = set()
+
+        self.sentRequestCount = 0
+        self.sentReplyCount = 0
+        self.receivedRequestCount = 0
+        self.receivedReplyCount = 0
+
+    def on_init(self, eventobj: Event):
+        self.otherNodeIDs = set(self.topology.nodes.keys())
+        self.otherNodeIDs.remove(self.componentinstancenumber)

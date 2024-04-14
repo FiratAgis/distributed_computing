@@ -14,7 +14,9 @@ __maintainer__ = "developer"
 __status__ = "Production"
 __version__ = "0.0.1"
 
-
+from adhoccomputing.Experimentation.Topology import Topology
+from adhoccomputing.GenericModel import GenericModel, GenericMessageHeader, GenericMessagePayload, GenericMessage
+from adhoccomputing.Generics import *
 from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock
 
 
@@ -45,3 +47,12 @@ class PetersonsLock(SharedExclusionLock):
 class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
     def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
         super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
+        self.lock: PetersonsLock | None = None
+
+    def on_init(self, eventobj: Event):
+        super().on_init(eventobj)
+        self.lock = PetersonsLock(self.no_op_duration)
+        network_list = sorted(list(self.otherNodeIDs) + [self.componentinstancenumber])
+        for net_member in network_list:
+            self.lock.addProcess(net_member)
+
