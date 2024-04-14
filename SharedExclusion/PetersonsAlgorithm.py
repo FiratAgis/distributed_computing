@@ -15,7 +15,7 @@ __status__ = "Production"
 __version__ = "0.0.1"
 
 
-from SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock
+from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock
 
 
 class PetersonsLock(SharedExclusionLock):
@@ -25,6 +25,7 @@ class PetersonsLock(SharedExclusionLock):
         self.turn = 0
 
     def lock(self, pid: int):
+        """Lock function for Peterson's Algorithm"""
         index = self.getIndex(pid)
         if index < 0:
             return
@@ -34,6 +35,7 @@ class PetersonsLock(SharedExclusionLock):
             self.no_op()
 
     def unlock(self, pid: int):
+        """Unlock function for Peterson's Algorithm"""
         index = self.getIndex(pid)
         if index < 0:
             return

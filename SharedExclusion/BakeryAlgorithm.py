@@ -15,16 +15,17 @@ __status__ = "Production"
 __version__ = "0.0.1"
 
 
-from SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock
+from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock
 
 
 class BakeryLock(SharedExclusionLock):
     def __init__(self, number_of_processes: int, no_op_duration: float = 1.0):
-        super().__init__(number_of_processes)
+        super().__init__(number_of_processes, no_op_duration)
         self.entering: list[bool] = [False] * number_of_processes
         self.ticket: list[int] = [0] * number_of_processes
 
     def lock(self, pid: int):
+        """Lock function for Bakery Algorithm"""
         index = self.getIndex(pid)
         if index < 0:
             return
@@ -40,6 +41,7 @@ class BakeryLock(SharedExclusionLock):
                     self.no_op()
 
     def unlock(self, pid: int):
+        """Unlock function for Bakery Algorithm"""
         index = self.getIndex(pid)
         if index < 0:
             return
