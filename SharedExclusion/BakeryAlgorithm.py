@@ -44,3 +44,8 @@ class BakeryLock(SharedExclusionLock):
         if index < 0:
             return
         self.ticket[index] = 0
+
+
+class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
+    def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
+        super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)

@@ -5,6 +5,6 @@ Code Documentation
    :toctree: generated
    :recursive:
 
-   Snapshot.Snapshot
-   Snapshot.ChandyLamportSnapshot
-   Snapshot.LaiYangSnapshot
+   SharedExclusion.SharedExclusion
+   SharedExclusion.PetersonsAlgorithm
+   SharedExclusion.BakeryAlgorithm
