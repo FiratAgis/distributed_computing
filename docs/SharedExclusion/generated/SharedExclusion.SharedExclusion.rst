@@ -23,6 +23,12 @@
    .. autoclass:: SharedExclusionLock
       :members:
       :undoc-members:
+   .. autoclass:: SharedExclusionMessageHeader
+      :members:
+      :undoc-members:
+   .. autoclass:: SharedExclusionMessagePayload
+      :members:
+      :undoc-members:
    
    
 
