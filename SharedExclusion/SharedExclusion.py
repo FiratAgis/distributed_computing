@@ -24,11 +24,16 @@ from time import sleep
 
 class SharedExclusionLock:
     """A generic lock implementation for mutual exclusion with support for processes with arbitrary positive pids."""
+
     def __init__(self, number_of_processes: int, no_op_duration: float):
         self.no_op_duration = no_op_duration
         self.number_of_processes: int = number_of_processes
-        self.free_processes: list[bool] = [True] * number_of_processes  # A list of bools that marks which process indices are unused
-        self.process_dictionary: dict[int, int] = {}  # A dictionary of process id to process index
+
+        # A list of bools that marks which process indices are unused
+        self.free_processes: list[bool] = [True] * number_of_processes
+
+        # A dictionary of process id to process index
+        self.process_dictionary: dict[int, int] = {}
 
     def addProcess(self, pid: int) -> int:
         """Adds a new process for arbitrary positive pid handling."""
@@ -88,11 +93,19 @@ class SharedExclusionComponentModel(GenericModel):
     Extend SharedExclusionComponentModel to implement your own mutual exclusion algorithm.
     """
     no_op_duration = 1.0
-    def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
+
+    def __init__(self,
+                 componentname,
+                 componentinstancenumber,
+                 context=None,
+                 configurationparameters=None,
+                 num_worker_threads=1,
+                 topology=None):
         """
         Initializes the SharedExclusionComponentModel
         """
-        super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
+        super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads,
+                         topology)
 
         self.clock = 0
 

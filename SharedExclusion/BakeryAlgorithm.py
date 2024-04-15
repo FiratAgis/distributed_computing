@@ -39,7 +39,8 @@ class BakeryLock(SharedExclusionLock):
             if not self.free_processes[i]:
                 while self.entering[i]:
                     self.no_op()
-                while self.ticket[i] != 0 and (self.ticket[i] < self.ticket[index] or (self.ticket[i] == self.ticket[index] and i < index)):
+                while (self.ticket[i] != 0 and
+                       (self.ticket[i] < self.ticket[index] or (self.ticket[i] == self.ticket[index] and i < index))):
                     self.no_op()
 
     def unlock(self, pid: int):
@@ -51,8 +52,15 @@ class BakeryLock(SharedExclusionLock):
 
 
 class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
-    def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
-        super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
+    def __init__(self,
+                 componentname,
+                 componentinstancenumber,
+                 context=None,
+                 configurationparameters=None,
+                 num_worker_threads=1,
+                 topology=None):
+        super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads,
+                         topology)
         self.lock: BakeryLock | None = None
 
     def on_init(self, eventobj: Event):

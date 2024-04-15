@@ -45,8 +45,15 @@ class PetersonsLock(SharedExclusionLock):
 
 
 class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
-    def __init__(self, componentname, componentinstancenumber, context=None, configurationparameters=None, num_worker_threads=1, topology=None):
-        super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads, topology)
+    def __init__(self,
+                 componentname,
+                 componentinstancenumber,
+                 context=None,
+                 configurationparameters=None,
+                 num_worker_threads=1,
+                 topology=None):
+        super().__init__(componentname, componentinstancenumber, context, configurationparameters, num_worker_threads,
+                         topology)
         self.lock: PetersonsLock | None = None
 
     def on_init(self, eventobj: Event):
@@ -55,4 +62,3 @@ class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
         network_list = sorted(list(self.otherNodeIDs) + [self.componentinstancenumber])
         for net_member in network_list:
             self.lock.addProcess(net_member)
-
