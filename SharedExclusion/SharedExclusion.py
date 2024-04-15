@@ -86,6 +86,18 @@ class SharedExclusionLock:
         sleep(self.no_op_duration)
 
 
+class SharedExclusionMessageHeader(GenericMessageHeader):
+    def __init__(self, messageType, messageFrom, messageTo, nextHop=float('inf'), interfaceID=float('inf'),
+                 sequenceID=-1):
+        super().__init__(messageType, messageFrom, messageTo, nextHop, interfaceID, sequenceID)
+
+
+class SharedExclusionMessagePayload(GenericMessagePayload):
+    def __init__(self, nodeID, messagepayload):
+        super().__init__(messagepayload)
+        self.nodeID = nodeID
+
+
 class SharedExclusionComponentModel(GenericModel):
     """
     A generic shared exclusion component model to implement various mutual exclusion algorithms.

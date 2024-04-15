@@ -14,10 +14,9 @@ __maintainer__ = "developer"
 __status__ = "Production"
 __version__ = "0.0.1"
 
-from adhoccomputing.Experimentation.Topology import Topology
-from adhoccomputing.GenericModel import GenericModel, GenericMessageHeader, GenericMessagePayload, GenericMessage
 from adhoccomputing.Generics import *
-from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock
+from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock, \
+    SharedExclusionMessagePayload, SharedExclusionMessageHeader
 
 
 class PetersonsLock(SharedExclusionLock):
@@ -44,6 +43,17 @@ class PetersonsLock(SharedExclusionLock):
         self.waiting[index] = False
 
 
+class PetersonsAlgorithmMessageHeader(SharedExclusionMessageHeader):
+    def __init__(self, messageType, messageFrom, messageTo, nextHop=float('inf'), interfaceID=float('inf'),
+                 sequenceID=-1):
+        super().__init__(messageType, messageFrom, messageTo, nextHop, interfaceID, sequenceID)
+
+
+class PetersonsAlgorithmMessagePayload(SharedExclusionMessagePayload):
+    def __init__(self, nodeID, messagepayload):
+        super().__init__(nodeID, messagepayload)
+
+
 class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
     def __init__(self,
                  componentname,
@@ -62,3 +72,4 @@ class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
         network_list = sorted(list(self.otherNodeIDs) + [self.componentinstancenumber])
         for net_member in network_list:
             self.lock.addProcess(net_member)
+

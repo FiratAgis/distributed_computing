@@ -14,10 +14,9 @@ __maintainer__ = "developer"
 __status__ = "Production"
 __version__ = "0.0.1"
 
-from adhoccomputing.Experimentation.Topology import Topology
-from adhoccomputing.GenericModel import GenericModel, GenericMessageHeader, GenericMessagePayload, GenericMessage
 from adhoccomputing.Generics import *
-from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock
+from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock, \
+    SharedExclusionMessagePayload, SharedExclusionMessageHeader
 
 
 class BakeryLock(SharedExclusionLock):
@@ -49,6 +48,17 @@ class BakeryLock(SharedExclusionLock):
         if index < 0:
             return
         self.ticket[index] = 0
+
+
+class BakeryAlgorithmMessageHeader(SharedExclusionMessageHeader):
+    def __init__(self, messageType, messageFrom, messageTo, nextHop=float('inf'), interfaceID=float('inf'),
+                 sequenceID=-1):
+        super().__init__(messageType, messageFrom, messageTo, nextHop, interfaceID, sequenceID)
+
+
+class BakeryAlgorithmMessagePayload(SharedExclusionMessagePayload):
+    def __init__(self, nodeID, messagepayload):
+        super().__init__(nodeID, messagepayload)
 
 
 class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
