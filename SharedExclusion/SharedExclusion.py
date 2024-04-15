@@ -17,7 +17,7 @@ __version__ = "0.0.1"
 from enum import Enum
 
 from adhoccomputing.Experimentation.Topology import Topology
-from adhoccomputing.GenericModel import GenericModel, GenericMessageHeader, GenericMessagePayload, GenericMessage
+from adhoccomputing.GenericModel import GenericModel
 from adhoccomputing.Generics import *
 from time import sleep
 
