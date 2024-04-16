@@ -16,7 +16,8 @@ __version__ = "0.0.1"
 
 from adhoccomputing.Generics import *
 from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock, \
-    SharedExclusionMessagePayload, SharedExclusionMessageHeader
+    SharedExclusionMessagePayload, SharedExclusionMessageHeader, Direction, SharedExclusionMessageTypes, \
+    SharedExclusionRequestTypes
 
 
 class BakeryLock(SharedExclusionLock):
@@ -34,6 +35,18 @@ class BakeryLock(SharedExclusionLock):
         self.ticket[index] = max(self.ticket) + 1
         self.entering[index] = False
 
+    def unlock(self, pid: int):
+        """Unlock function for Bakery Algorithm"""
+        index = self.getIndex(pid)
+        if index < 0:
+            return
+        self.ticket[index] = 0
+
+    def enter(self, pid: int):
+        """Enter function for Peterson's Algorithm"""
+        index = self.getIndex(pid)
+        if index < 0:
+            return
         for i in range(self.number_of_processes):
             if not self.free_processes[i]:
                 while self.entering[i]:
@@ -41,13 +54,6 @@ class BakeryLock(SharedExclusionLock):
                 while (self.ticket[i] != 0 and
                        (self.ticket[i] < self.ticket[index] or (self.ticket[i] == self.ticket[index] and i < index))):
                     self.no_op()
-
-    def unlock(self, pid: int):
-        """Unlock function for Bakery Algorithm"""
-        index = self.getIndex(pid)
-        if index < 0:
-            return
-        self.ticket[index] = 0
 
 
 class BakeryAlgorithmMessageHeader(SharedExclusionMessageHeader):
@@ -57,11 +63,21 @@ class BakeryAlgorithmMessageHeader(SharedExclusionMessageHeader):
 
 
 class BakeryAlgorithmMessagePayload(SharedExclusionMessagePayload):
-    def __init__(self, nodeID, messagepayload):
-        super().__init__(nodeID, messagepayload)
+    def __init__(self,
+                 originalsenderid,
+                 originalreceiverid,
+                 originalmessagetype,
+                 originalsenderclock,
+                 originalreceiverclock,
+                 messagepayload=None):
+        super().__init__(originalsenderid, originalreceiverid, originalmessagetype, originalsenderclock,
+                         originalreceiverclock, messagepayload)
 
 
 class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
+    """
+    Component for managing the Shared Memory Mutual Exclusion via Bakery Algorithm
+    """
     def __init__(self,
                  componentname,
                  componentinstancenumber,
@@ -79,3 +95,43 @@ class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
         network_list = sorted(list(self.otherNodeIDs) + [self.componentinstancenumber])
         for net_member in network_list:
             self.lock.addProcess(net_member)
+
+    def message_received(self, direction: Direction, header, message):
+        if header.messageto != self.componentinstancenumber:
+            if header.nexthop == self.componentinstancenumber:
+                self.relay_message(direction, header, message)
+        elif header.messagetype in SharedExclusionMessageTypes:
+            super().message_received(direction, header, message)
+
+    def lock_message(self, direction: Direction, header, message):
+        pass
+
+    def lock_ack_message(self, direction: Direction, header, message):
+        pass
+
+    def enter_message(self, direction: Direction, header, message):
+        pass
+
+    def enter_ack_message(self, direction: Direction, header, message):
+        pass
+
+    def unlock_message(self, direction: Direction, header, message):
+        pass
+
+    def unlock_ack_message(self, direction: Direction, header, message):
+        pass
+
+    def locked(self, request):
+        pass
+
+    def enter_critical_section(self):
+        clock = self.add_request(SharedExclusionRequestTypes.LOCK, self.locked)
+        self.lock.lock(self.componentinstancenumber)
+
+        for nodeID in self.otherNodeIDs:
+            payload = BakeryAlgorithmMessagePayload(self.componentinstancenumber, nodeID,
+                                                    SharedExclusionMessageTypes.LOCK, clock, 0)
+            self.send_all(nodeID, SharedExclusionMessageTypes.LOCK, payload)
+
+    def exit_critical_section(self):
+        pass

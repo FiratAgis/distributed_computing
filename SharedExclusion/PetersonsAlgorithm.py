@@ -16,7 +16,7 @@ __version__ = "0.0.1"
 
 from adhoccomputing.Generics import *
 from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock, \
-    SharedExclusionMessagePayload, SharedExclusionMessageHeader
+    SharedExclusionMessagePayload, SharedExclusionMessageHeader, SharedExclusionMessageTypes, Direction
 
 
 class PetersonsLock(SharedExclusionLock):
@@ -32,8 +32,6 @@ class PetersonsLock(SharedExclusionLock):
             return
         self.waiting[index] = True
         self.turn = (1 - index) % 2
-        while self.waiting[(index - 1) % 2] and self.turn == (1 - index) % 2:
-            self.no_op()
 
     def unlock(self, pid: int):
         """Unlock function for Peterson's Algorithm"""
@@ -41,6 +39,14 @@ class PetersonsLock(SharedExclusionLock):
         if index < 0:
             return
         self.waiting[index] = False
+
+    def enter(self, pid: int):
+        """Enter function for Peterson's Algorithm"""
+        index = self.getIndex(pid)
+        if index < 0:
+            return
+        while self.waiting[(index - 1) % 2] and self.turn == (1 - index) % 2:
+            self.no_op()
 
 
 class PetersonsAlgorithmMessageHeader(SharedExclusionMessageHeader):
@@ -50,11 +56,21 @@ class PetersonsAlgorithmMessageHeader(SharedExclusionMessageHeader):
 
 
 class PetersonsAlgorithmMessagePayload(SharedExclusionMessagePayload):
-    def __init__(self, nodeID, messagepayload):
-        super().__init__(nodeID, messagepayload)
+    def __init__(self,
+                 originalsenderid,
+                 originalreceiverid,
+                 originalmessagetype,
+                 originalsenderclock,
+                 originalreceiverclock,
+                 messagepayload=None):
+        super().__init__(originalsenderid, originalreceiverid, originalmessagetype, originalsenderclock,
+                         originalreceiverclock, messagepayload)
 
 
 class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
+    """
+    Component for managing the Shared Memory Mutual Exclusion via Peterson's Algorithm
+    """
     def __init__(self,
                  componentname,
                  componentinstancenumber,
@@ -73,3 +89,33 @@ class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
         for net_member in network_list:
             self.lock.addProcess(net_member)
 
+    def message_received(self, direction: Direction, header, message):
+        if header.messageto != self.componentinstancenumber:
+            if header.nexthop == self.componentinstancenumber:
+                self.relay_message(direction, header, message)
+        elif header.messagetype in SharedExclusionMessageTypes:
+            super().message_received(direction, header, message)
+
+    def lock_message(self, direction: Direction, header, message):
+        pass
+
+    def lock_ack_message(self, direction: Direction, header, message):
+        pass
+
+    def enter_message(self, direction: Direction, header, message):
+        pass
+
+    def enter_ack_message(self, direction: Direction, header, message):
+        pass
+
+    def unlock_message(self, direction: Direction, header, message):
+        pass
+
+    def unlock_ack_message(self, direction: Direction, header, message):
+        pass
+
+    def enter_critical_section(self):
+        pass
+
+    def exit_critical_section(self):
+        pass
