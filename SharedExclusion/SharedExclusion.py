@@ -23,19 +23,9 @@ from time import sleep
 
 class SharedExclusionMessageTypes(Enum):
     NONE = "SHARED_MESSAGE_NONE"
-    LOCK = "SHARED_MESSAGE_LOCK"
-    LOCK_ACK = "SHARED_MESSAGE_LOCK_ACK"
-    ENTER = "SHARED_MESSAGE_ENTER"
-    ENTER_ACK = "SHARED_MESSAGE_ENTER_ACK"
-    UNLOCK = "SHARED_MESSAGE_UNLOCK"
-    UNLOCK_ACK = "SHARED_MESSAGE_UNLOCK_ACK"
-
-
-class SharedExclusionRequestTypes(Enum):
-    NONE = "SHARED_REQUEST_NONE"
-    LOCK = "SHARED_REQUEST_LOCK"
-    ENTER = "SHARED_REQUEST_ENTER"
-    UNLOCK = "SHARED_REQUEST_UNLOCK"
+    ENTER_REQUEST = "SHARED_MESSAGE_ENTER_REQUEST"
+    ENTER_PERMISSION = "SHARED_MESSAGE_ENTER_REQUEST"
+    LEAVE_NOTIFICATION = "SHARED_LEAVE_NOTIFICATION"
 
 
 class SharedExclusionRequest:
@@ -134,19 +124,8 @@ class SharedExclusionMessageHeader(GenericMessageHeader):
 
 
 class SharedExclusionMessagePayload(GenericMessagePayload):
-    def __init__(self,
-                 originalsenderid,
-                 originalreceiverid,
-                 originalmessagetype,
-                 originalsenderclock,
-                 originalreceiverclock,
-                 messagepayload=None):
-        super().__init__(messagepayload)
-        self.originalsenderid = originalsenderid
-        self.originalreceiverid = originalreceiverid
-        self.originalmessagetype = originalmessagetype
-        self.originalsenderclock = originalsenderclock
-        self.originalreceiverclock = originalreceiverclock
+    def __init__(self, payload):
+        super().__init__(payload)
 
 
 class SharedExclusionComponentModel(GenericModel):
@@ -171,13 +150,15 @@ class SharedExclusionComponentModel(GenericModel):
                          topology)
 
         self.clock = 0
-
+        self.leaderId = 0
         self.otherNodeIDs = set()
-        self.active_requests: dict[int, SharedExclusionRequest] = {}
 
     def on_init(self, eventobj: Event):
         self.otherNodeIDs = set(self.topology.nodes.keys())
         self.otherNodeIDs.remove(self.componentinstancenumber)
+
+    def set_leader(self, leaderId: int):
+        self.leaderId = leaderId
 
     def on_message_from_bottom(self, eventobj: Event):
         """
@@ -208,53 +189,20 @@ class SharedExclusionComponentModel(GenericModel):
         Generic message processing function, forwards the message to the function that is supposed to
          process it according to its type
         """
-        if header.messagetype == SharedExclusionMessageTypes.LOCK:
-            self.lock_message(direction, header, message)
-        elif header.messagetype == SharedExclusionMessageTypes.LOCK_ACK:
-            self.lock_ack_message(direction, header, message)
-        elif header.messagetype == SharedExclusionMessageTypes.ENTER:
-            self.enter_message(direction, header, message)
-        elif header.messagetype == SharedExclusionMessageTypes.ENTER_ACK:
-            self.enter_ack_message(direction, header, message)
-        elif header.messagetype == SharedExclusionMessageTypes.UNLOCK:
-            self.unlock_message(direction, header, message)
-        elif header.messagetype == SharedExclusionMessageTypes.UNLOCK_ACK:
-            self.unlock_ack_message(direction, header, message)
+        if header.messagetype == SharedExclusionMessageTypes.ENTER_PERMISSION:
+            self.permission_message(direction, header, message)
+        elif header.messagetype == SharedExclusionMessageTypes.ENTER_REQUEST:
+            self.request_message(direction, header, message)
+        elif header.messagetype == SharedExclusionMessageTypes.LEAVE_NOTIFICATION:
+            self.notification_message(direction, header, message)
 
-    def lock_message(self, direction: Direction, header, message):
-        """
-        Generic behavior when a lock message is received, needs to be overloaded.
-        """
+    def permission_message(self, direction: Direction, header, message):
         pass
 
-    def lock_ack_message(self, direction: Direction, header, message):
-        """
-        Generic behavior when a lock acknowledgement message is received, needs to be overloaded.
-        """
+    def request_message(self, direction: Direction, header, message):
         pass
 
-    def enter_message(self, direction: Direction, header, message):
-        """
-        Generic behavior when an enter message is received, needs to be overloaded.
-        """
-        pass
-
-    def enter_ack_message(self, direction: Direction, header, message):
-        """
-        Generic behavior when an enter acknowledgement message is received, needs to be overloaded.
-        """
-        pass
-
-    def unlock_message(self, direction: Direction, header, message):
-        """
-        Generic behavior when an unlock message is received, needs to be overloaded.
-        """
-        pass
-
-    def unlock_ack_message(self, direction: Direction, header, message):
-        """
-        Generic behavior when an unlock acknowledgement message is received, needs to be overloaded.
-        """
+    def notification_message(self, direction: Direction, header, message):
         pass
 
     def enter_critical_section(self):
@@ -299,18 +247,3 @@ class SharedExclusionComponentModel(GenericModel):
             message.header = header
             if direction != Direction.NONE:
                 self.send_message(direction, message)
-
-    def send_all(self, nodeID, messageType, payload):
-        """
-        Send the payload to all possible connections
-        """
-        self.send_message_to(nodeID, messageType, payload, Direction.UP)
-        self.send_message_to(nodeID, messageType, payload, Direction.DOWN)
-        self.send_message_to(nodeID, messageType, payload, Direction.PEER)
-
-    def add_request(self, request_type, request_complete):
-        clock = self.clock
-        self.active_requests[clock] = SharedExclusionRequest(clock, request_type, len(self.otherNodeIDs),
-                                                                  request_complete)
-        self.clock += 1
-        return clock

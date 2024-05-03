@@ -45,7 +45,7 @@ class PetersonsLock(SharedExclusionLock):
         index = self.getIndex(pid)
         if index < 0:
             return
-        while self.waiting[(index - 1) % 2] and self.turn == (1 - index) % 2:
+        if self.waiting[(index - 1) % 2] and self.turn == (1 - index) % 2:
             self.no_op()
 
 
@@ -56,15 +56,8 @@ class PetersonsAlgorithmMessageHeader(SharedExclusionMessageHeader):
 
 
 class PetersonsAlgorithmMessagePayload(SharedExclusionMessagePayload):
-    def __init__(self,
-                 originalsenderid,
-                 originalreceiverid,
-                 originalmessagetype,
-                 originalsenderclock,
-                 originalreceiverclock,
-                 messagepayload=None):
-        super().__init__(originalsenderid, originalreceiverid, originalmessagetype, originalsenderclock,
-                         originalreceiverclock, messagepayload)
+    def __init__(self, messagepayload=None):
+        super().__init__(messagepayload)
 
 
 class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
@@ -96,23 +89,20 @@ class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
         elif header.messagetype in SharedExclusionMessageTypes:
             super().message_received(direction, header, message)
 
-    def lock_message(self, direction: Direction, header, message):
-        pass
+    def request_message(self, direction: Direction, header: PetersonsAlgorithmMessageHeader, message):
+        if self.componentinstancenumber == self.leaderId:
+            self.lock.lock(header.messagefrom)
+            self.lock.enter(header.messagefrom)
+            self.send_message_to(header.messagefrom, SharedExclusionMessageTypes.ENTER_PERMISSION, None, direction)
 
-    def lock_ack_message(self, direction: Direction, header, message):
-        pass
+    def permission_message(self, direction: Direction, header, message):
+        self.enter_critical_section()
+        self.exit_critical_section()
+        self.send_message_to(self.leaderId, SharedExclusionMessageTypes.LEAVE_NOTIFICATION, None, direction)
 
-    def enter_message(self, direction: Direction, header, message):
-        pass
-
-    def enter_ack_message(self, direction: Direction, header, message):
-        pass
-
-    def unlock_message(self, direction: Direction, header, message):
-        pass
-
-    def unlock_ack_message(self, direction: Direction, header, message):
-        pass
+    def notification_message(self, direction: Direction, header, message):
+        if self.componentinstancenumber == self.leaderId:
+            self.lock.unlock(header.messagefrom)
 
     def enter_critical_section(self):
         pass

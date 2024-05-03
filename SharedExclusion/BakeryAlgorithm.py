@@ -16,8 +16,7 @@ __version__ = "0.0.1"
 
 from adhoccomputing.Generics import *
 from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, SharedExclusionLock, \
-    SharedExclusionMessagePayload, SharedExclusionMessageHeader, Direction, SharedExclusionMessageTypes, \
-    SharedExclusionRequestTypes
+    SharedExclusionMessagePayload, SharedExclusionMessageHeader, Direction, SharedExclusionMessageTypes
 
 
 class BakeryLock(SharedExclusionLock):
@@ -41,6 +40,7 @@ class BakeryLock(SharedExclusionLock):
         if index < 0:
             return
         self.ticket[index] = 0
+        self.isInside = False
 
     def enter(self, pid: int):
         """Enter function for Peterson's Algorithm"""
@@ -64,14 +64,8 @@ class BakeryAlgorithmMessageHeader(SharedExclusionMessageHeader):
 
 class BakeryAlgorithmMessagePayload(SharedExclusionMessagePayload):
     def __init__(self,
-                 originalsenderid,
-                 originalreceiverid,
-                 originalmessagetype,
-                 originalsenderclock,
-                 originalreceiverclock,
                  messagepayload=None):
-        super().__init__(originalsenderid, originalreceiverid, originalmessagetype, originalsenderclock,
-                         originalreceiverclock, messagepayload)
+        super().__init__(messagepayload)
 
 
 class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
@@ -103,35 +97,23 @@ class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
         elif header.messagetype in SharedExclusionMessageTypes:
             super().message_received(direction, header, message)
 
-    def lock_message(self, direction: Direction, header, message):
-        pass
+    def request_message(self, direction: Direction, header: BakeryAlgorithmMessageHeader, message):
+        if self.componentinstancenumber == self.leaderId:
+            self.lock.lock(header.messagefrom)
+            self.lock.enter(header.messagefrom)
+            self.send_message_to(header.messagefrom, SharedExclusionMessageTypes.ENTER_PERMISSION, None, direction)
 
-    def lock_ack_message(self, direction: Direction, header, message):
-        pass
+    def permission_message(self, direction: Direction, header, message):
+        self.enter_critical_section()
+        self.exit_critical_section()
+        self.send_message_to(self.leaderId, SharedExclusionMessageTypes.LEAVE_NOTIFICATION, None, direction)
 
-    def enter_message(self, direction: Direction, header, message):
-        pass
-
-    def enter_ack_message(self, direction: Direction, header, message):
-        pass
-
-    def unlock_message(self, direction: Direction, header, message):
-        pass
-
-    def unlock_ack_message(self, direction: Direction, header, message):
-        pass
-
-    def locked(self, request):
-        pass
+    def notification_message(self, direction: Direction, header, message):
+        if self.componentinstancenumber == self.leaderId:
+            self.lock.unlock(header.messagefrom)
 
     def enter_critical_section(self):
-        clock = self.add_request(SharedExclusionRequestTypes.LOCK, self.locked)
-        self.lock.lock(self.componentinstancenumber)
-
-        for nodeID in self.otherNodeIDs:
-            payload = BakeryAlgorithmMessagePayload(self.componentinstancenumber, nodeID,
-                                                    SharedExclusionMessageTypes.LOCK, clock, 0)
-            self.send_all(nodeID, SharedExclusionMessageTypes.LOCK, payload)
+        pass
 
     def exit_critical_section(self):
         pass
