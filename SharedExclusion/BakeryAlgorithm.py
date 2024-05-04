@@ -84,6 +84,10 @@ class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
         self.lock: BakeryLock | None = None
 
     def on_init(self, eventobj: Event):
+        """
+        After calling the parent on_init, initializes the self.lock: BakeryLock and adds the members of the topology
+        to it.
+        """
         super().on_init(eventobj)
         self.lock = BakeryLock(len(self.otherNodeIDs) + 1, self.no_op_duration)
         network_list = sorted(list(self.otherNodeIDs) + [self.componentinstancenumber])
@@ -91,6 +95,10 @@ class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
             self.lock.addProcess(net_member)
 
     def message_received(self, direction: Direction, header, message):
+        """
+        If the message is for the component, calls the parent function for redirecting it to the correct function. If
+        the message is not for the component, calls the function for relaying the message.
+        """
         if header.messageto != self.componentinstancenumber:
             if header.nexthop == self.componentinstancenumber:
                 self.relay_message(direction, header, message)
@@ -98,22 +106,30 @@ class BakeryAlgorithmComponentModel(SharedExclusionComponentModel):
             super().message_received(direction, header, message)
 
     def request_message(self, direction: Direction, header: BakeryAlgorithmMessageHeader, message):
+        """
+        If the component is the leader, performs the appropriate actions necessary when a process requests entry
+        into the critical section.
+        """
         if self.componentinstancenumber == self.leaderId:
             self.lock.lock(header.messagefrom)
             self.lock.enter(header.messagefrom)
             self.send_message_to(header.messagefrom, SharedExclusionMessageTypes.ENTER_PERMISSION, None, direction)
 
     def permission_message(self, direction: Direction, header, message):
-        self.enter_critical_section()
-        self.exit_critical_section()
-        self.send_message_to(self.leaderId, SharedExclusionMessageTypes.LEAVE_NOTIFICATION, None, direction)
+        """
+        Calls the callback function (the function that will use the critical section). If callback function is not set,
+        automatically exits the critical section. Otherwise, after the function is done with the critical section, it
+        should call the exit_critical_section function.
+        """
+        if self.callback is not None:
+            self.callback()
+        else:
+            self.exit_critical_section()
 
     def notification_message(self, direction: Direction, header, message):
+        """
+        If the component is the leader, performs the appropriate actions necessary when a process requests to exit
+        from the critical section.
+        """
         if self.componentinstancenumber == self.leaderId:
             self.lock.unlock(header.messagefrom)
-
-    def enter_critical_section(self):
-        pass
-
-    def exit_critical_section(self):
-        pass

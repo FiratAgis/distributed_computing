@@ -14,7 +14,6 @@ __maintainer__ = "developer"
 __status__ = "Production"
 __version__ = "0.0.1"
 
-from enum import Enum
 from adhoccomputing.Experimentation.Topology import Topology
 from adhoccomputing.GenericModel import GenericModel
 from adhoccomputing.Generics import *
@@ -114,6 +113,7 @@ class SharedExclusionLock:
         pass
 
     def no_op(self):
+        """Generic No Op Action."""
         sleep(self.no_op_duration)
 
 
@@ -152,17 +152,32 @@ class SharedExclusionComponentModel(GenericModel):
         self.clock = 0
         self.leaderId = 0
         self.otherNodeIDs = set()
+        self.callback = None
 
     def on_init(self, eventobj: Event):
+        """
+        Collects the other members of the topology on initialization.
+        """
         self.otherNodeIDs = set(self.topology.nodes.keys())
         self.otherNodeIDs.remove(self.componentinstancenumber)
 
     def set_leader(self, leaderId: int):
+        """
+        Set the leader of the group, should be called by a component that does leader election for every member of
+        the topology before initialization.
+        """
         self.leaderId = leaderId
+
+    def set_callback(self, callback):
+        """
+        Sets the action that will be performed when the process enters the critical section. Can potentially be changed
+        in runtime.
+        """
+        self.callback = callback
 
     def on_message_from_bottom(self, eventobj: Event):
         """
-        Records the direction of the message and sends the generic message processing function
+        Records the direction of the message and sends the generic message processing function.
         """
         message = eventobj.eventcontent
         header = message.header
@@ -170,7 +185,7 @@ class SharedExclusionComponentModel(GenericModel):
 
     def on_message_from_top(self, eventobj: Event):
         """
-        Records the direction of the message and sends the generic message processing function
+        Records the direction of the message and sends the generic message processing function.
         """
         message = eventobj.eventcontent
         header = message.header
@@ -178,7 +193,7 @@ class SharedExclusionComponentModel(GenericModel):
 
     def on_message_from_peer(self, eventobj: Event):
         """
-        Records the direction of the message and sends the generic message processing function
+        Records the direction of the message and sends the generic message processing function.
         """
         message = eventobj.eventcontent
         header = message.header
@@ -187,7 +202,7 @@ class SharedExclusionComponentModel(GenericModel):
     def message_received(self, direction: Direction, header, message):
         """
         Generic message processing function, forwards the message to the function that is supposed to
-         process it according to its type
+        process it according to its type.
         """
         if header.messagetype == SharedExclusionMessageTypes.ENTER_PERMISSION:
             self.permission_message(direction, header, message)
@@ -197,29 +212,43 @@ class SharedExclusionComponentModel(GenericModel):
             self.notification_message(direction, header, message)
 
     def permission_message(self, direction: Direction, header, message):
+        """
+        Procedure to perform when the messages that gives the process permission to enter the critical section
+        arrives, need to be overloaded.
+        """
         pass
 
     def request_message(self, direction: Direction, header, message):
+        """
+        Procedure to perform when the messages that ask for a process permission to enter the critical section
+        arrives, need to be overloaded. Should only be applicable to the leader of the group.
+        """
         pass
 
     def notification_message(self, direction: Direction, header, message):
+        """
+        Procedure to perform when the messages that notifies the leader that a process exited the critical section
+        arrives, need to be overloaded. Should only be applicable to the leader of the group.
+        """
         pass
 
     def enter_critical_section(self):
         """
-        Procedure to perform when the process needs to enter the critical section, need to be overloaded
+        Procedure to perform when the process needs to enter the critical section, sends a request to the leader for
+        entering the critical section.
         """
-        pass
+        self.send_message_to(self.leaderId, SharedExclusionMessageTypes.ENTER_REQUEST, None, Direction.DOWN)
 
     def exit_critical_section(self):
         """
-        Procedure to perform when the process needs to exit the critical section, need to be overloaded
+        Procedure to perform when the process needs to exit the critical section, sends a notification the leader that
+        the procudure is done with the critical section.
         """
-        pass
+        self.send_message_to(self.leaderId, SharedExclusionMessageTypes.LEAVE_NOTIFICATION, None, Direction.DOWN)
 
     def send_message(self, direction: Direction, message):
         """
-        Sends a message in the specified direction
+        Sends a message in the specified direction.
         """
         if direction == Direction.NONE:
             self.send_self(Event(self, ))
@@ -231,6 +260,9 @@ class SharedExclusionComponentModel(GenericModel):
             self.send_up(Event(self, EventTypes.MFRP, message))
 
     def send_message_to(self, targetId, messageType, payload, direction: Direction = Direction.NONE):
+        """
+        Default function for sending messages.
+        """
         nextHop = self.topology.get_next_hop(self.componentinstancenumber, targetId)
         interfaceID = f"{self.componentinstancenumber}-{nextHop}"
         header = SharedExclusionMessageHeader(messageType, self.componentinstancenumber, targetId, nextHop, interfaceID)
@@ -239,6 +271,9 @@ class SharedExclusionComponentModel(GenericModel):
             self.send_message(direction, message)
 
     def relay_message(self, direction: Direction, header, message):
+        """
+        Default function for relaying messages.
+        """
         nextHop = self.topology.get_next_hop(self.componentinstancenumber, header.messageto)
         interfaceID = f"{self.componentinstancenumber}-{nextHop}"
         if nextHop != float("inf") and nextHop != self.componentinstancenumber:
