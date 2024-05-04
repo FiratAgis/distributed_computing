@@ -1,5 +1,5 @@
 """
-    Implementation of the Peterson's Algorithm for mutual exclusion.
+Implementation of the Peterson's Algorithm for mutual exclusion.
 """
 
 __author__ = "Fırat Ağış"

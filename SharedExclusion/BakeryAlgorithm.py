@@ -40,7 +40,6 @@ class BakeryLock(SharedExclusionLock):
         if index < 0:
             return
         self.ticket[index] = 0
-        self.isInside = False
 
     def enter(self, pid: int):
         """Enter function for Peterson's Algorithm"""
