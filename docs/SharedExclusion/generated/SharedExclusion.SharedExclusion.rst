@@ -38,9 +38,6 @@
    .. autoclass:: SharedExclusionRequest
       :members:
       :undoc-members:
-   .. autoclass:: SharedExclusionRequestTypes
-      :members:
-      :undoc-members:
    
    
 

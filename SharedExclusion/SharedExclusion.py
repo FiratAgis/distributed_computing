@@ -21,6 +21,10 @@ from time import sleep
 
 
 class SharedExclusionMessageTypes(Enum):
+    """
+    Message types for requesting entry to the critical section, granting permission to the critical section and
+    notifying the exit from the critical section.
+    """
     NONE = "SHARED_MESSAGE_NONE"
     ENTER_REQUEST = "SHARED_MESSAGE_ENTER_REQUEST"
     ENTER_PERMISSION = "SHARED_MESSAGE_ENTER_REQUEST"
@@ -42,6 +46,10 @@ class SharedExclusionRequest:
 
 
 class Direction(Enum):
+    """
+    Directions for the purpose of sending messages, enabling responding messages from the direction they came before.
+    But newly generated messages assumes Direction.DOWN as the default direction.
+    """
     NONE = 0
     UP = 1
     DOWN = 2
@@ -49,9 +57,21 @@ class Direction(Enum):
 
 
 class SharedExclusionLock:
-    """A generic lock implementation for mutual exclusion with support for processes with arbitrary positive pids."""
+    """
+    A generic lock implementation for mutual exclusion with support for processes with arbitrary positive pids.
+    """
 
     def __init__(self, number_of_processes: int, no_op_duration: float):
+        """
+        Initializes the lock.
+
+        Parameters
+        -----------
+        number_of_processes: int
+            Number of processes the lock will be responsible for.
+        no_op_duration: float
+            The duration of sleep when the no-op operation is called, in terms of seconds.
+        """
         self.no_op_duration = no_op_duration
         self.number_of_processes: int = number_of_processes
 
@@ -62,7 +82,19 @@ class SharedExclusionLock:
         self.process_dictionary: dict[int, int] = {}
 
     def addProcess(self, pid: int) -> int:
-        """Adds a new process for arbitrary positive pid handling."""
+        """
+        Adds a new process for arbitrary positive pid handling.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+
+        Returns
+        --------
+        int
+            Returns the index of the process. Returns -1 if all possible indices are taken.
+        """
         retval = 0
         while retval < self.number_of_processes and (not self.free_processes[retval]):
             retval += 1
@@ -74,7 +106,19 @@ class SharedExclusionLock:
             return -1
 
     def removeProcess(self, pid: int) -> int:
-        """Removes a process from arbitrary positive pid handling."""
+        """
+        Removes a process from arbitrary positive pid handling.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+
+        Returns
+        --------
+        int
+            Returns the freed index. Returns -1 if the process was not handled by the lock.
+        """
         if pid not in self.process_dictionary.keys():
             return -1
         else:
@@ -84,14 +128,38 @@ class SharedExclusionLock:
             return index
 
     def getIndex(self, pid: int) -> int:
-        """pid to internal index conversion."""
+        """
+        Process id to internal index conversion.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+
+        Returns
+        --------
+        int
+            Current index of the process. Returns -1 if the process was not handled by the lock.
+        """
         if pid not in self.process_dictionary.keys():
             return -1
         else:
             return self.process_dictionary[pid]
 
     def getPID(self, index: int) -> int:
-        """internal index to pid conversion."""
+        """
+        Internal index to process id conversion.
+
+        Parameters
+        -----------
+        index: int
+            Internal index of a process.
+
+        Returns
+        --------
+        int
+            Process id of the process with the given index. Returns -1 if the index is free.
+        """
         if self.free_processes[index]:
             return -1
         else:
@@ -101,19 +169,42 @@ class SharedExclusionLock:
             return -1
 
     def lock(self, pid: int):
-        """Generic lock function, needs to be overloaded"""
+        """
+        Generic lock function, needs to be overloaded.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+        """
         pass
 
     def unlock(self, pid: int):
-        """Generic unlock function, needs to be overloaded"""
+        """
+        Generic unlock function, needs to be overloaded.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+        """
         pass
 
     def enter(self, pid: int):
-        """Generic enter function, needs to be overloaded"""
+        """
+        Generic enter function, needs to be overloaded.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+        """
         pass
 
     def no_op(self):
-        """Generic No Op Action."""
+        """
+        NO-OP operation, calls sleep for a predetermined amount of time.
+        """
         sleep(self.no_op_duration)
 
 

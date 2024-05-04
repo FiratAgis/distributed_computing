@@ -21,12 +21,29 @@ from SharedExclusion.SharedExclusion import SharedExclusionComponentModel, Share
 
 class PetersonsLock(SharedExclusionLock):
     def __init__(self, no_op_duration: float = 1.0):
+        """
+        Calls the __init__ of its parent, then initializes the waiting and turn fields. Does not include
+        number_of_process field as Peterson's lock handles exactly 2 processes.
+
+        Parameters
+        -----------
+        no_op_duration: float
+            The duration of sleep when the no-op operation is called, in terms of seconds.
+        """
+
         super().__init__(2, no_op_duration)
         self.waiting = [False] * 2
         self.turn = 0
 
     def lock(self, pid: int):
-        """Lock function for Peterson's Algorithm"""
+        """
+        Lock function for Peterson's Algorithm.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+        """
         index = self.getIndex(pid)
         if index < 0:
             return
@@ -34,14 +51,28 @@ class PetersonsLock(SharedExclusionLock):
         self.turn = (1 - index) % 2
 
     def unlock(self, pid: int):
-        """Unlock function for Peterson's Algorithm"""
+        """
+        Unlock function for Peterson's Algorithm.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+        """
         index = self.getIndex(pid)
         if index < 0:
             return
         self.waiting[index] = False
 
     def enter(self, pid: int):
-        """Enter function for Peterson's Algorithm"""
+        """
+        Enter function for Peterson's Algorithm.
+
+        Parameters
+        -----------
+        pid: int
+            Process id of a process.
+        """
         index = self.getIndex(pid)
         if index < 0:
             return
@@ -78,13 +109,14 @@ class PetersonsAlgorithmComponentModel(SharedExclusionComponentModel):
     def on_init(self, eventobj: Event):
         """
         After calling the parent on_init, initializes the self.lock: PetersonsLock and adds the members of the topology
-        to it.
+        to it if the component is the leader of the topology.
         """
         super().on_init(eventobj)
-        self.lock = PetersonsLock(self.no_op_duration)
-        network_list = sorted(list(self.otherNodeIDs) + [self.componentinstancenumber])
-        for net_member in network_list:
-            self.lock.addProcess(net_member)
+        if self.componentinstancenumber == self.leaderId:
+            self.lock = PetersonsLock(self.no_op_duration)
+            network_list = sorted(list(self.otherNodeIDs) + [self.componentinstancenumber])
+            for net_member in network_list:
+                self.lock.addProcess(net_member)
 
     def message_received(self, direction: Direction, header, message):
         """
