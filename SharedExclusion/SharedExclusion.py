@@ -333,7 +333,7 @@ class SharedExclusionComponentModel(GenericModel):
     def exit_critical_section(self):
         """
         Procedure to perform when the process needs to exit the critical section, sends a notification the leader that
-        the procudure is done with the critical section.
+        the procedure is done with the critical section.
         """
         self.send_message_to(self.leaderId, SharedExclusionMessageTypes.LEAVE_NOTIFICATION, None, Direction.DOWN)
 

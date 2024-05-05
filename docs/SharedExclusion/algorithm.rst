@@ -3,8 +3,6 @@
 SharedExclusion
 =========================================
 
-In a regular systems with multiple processes or a disturbed systems with many members (which we will also call processes for simplicity), while working on the same data, it is common for many processes to want to access or modify the same piece of data. But a process changing the data while the other is reading it might create unwanted effects. We call these race conditions, where two or more processes races to work on the same piece of memory. We call the regions of code that access or modify the same shared memory a critical section. Mutual exclusion in a shared memory is a common way of handling these race conditions, by forcing processes to enter critical sections in a mutually exclusive fashion. This enables multiple processes to work on the same piece of data, which enables us to run algorithms which process a piece of data in a concurrent way.
-
 Background and Related Work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -13,13 +11,13 @@ Present any background information survey the related work. Provide citations.
 Distributed Algorithm: SharedExclusion
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-SharedExclusion is a collection of algorithms for mutual exclusion in shared distrubuted memory, spesifically Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ and Bakery :ref:`Algorithm <BakeryAlgorithm>` [Lamport1974]_.  
+SharedExclusion is a collection of algorithms for mutual exclusion in shared distributed memory, specifically Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ and Bakery :ref:`Algorithm <BakeryAlgorithm>` [Lamport1974]_.   
 
 
 Peterson's Algorithm
 """"""""""""""""""""""""
 
-Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ works for 2 processes, lets call them p_0 and p_1, and prevents both of them from entering the critical section in the same time. It achieves this by a way of each process giving way to other. When the process comes to the critical section, it first allows the other process to continue to the critical section and only moves forward if the other is not currently trying to enter the critical section or if the other process finishes its work within the critical section. While it is a gentleman's way of handling shared memory exclusion, its main limitation lies in the fact that it only works for 2 processes. This can be circumnavigated by a cascading giving way action for processes arranged in a binary tree but that will be explored later.
+Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ works for two processes, let's call them p_0 and p_1, and prevents both of them from entering the critical section at the same time. It achieves this by way of each process giving way to another. When the process comes to the critical section, it first allows the other process to continue to the critical section and only moves forward if the other is not currently trying to enter the critical section or if the other process finishes its work within the critical section. While it is a gentleman's way of handling shared memory exclusion, its main limitation lies in the fact that it only works for two processes. This can be circumnavigated by a cascading that gives way to action for processes arranged in a binary tree, but that will be explored later.
 
 .. _PetersonsAlgorithm:
 
@@ -43,19 +41,19 @@ Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ works for 2 pro
             waiting[i] ← false;
         end if
 
-While many idea of the algorithm is simple, it is benefical to get a line by line perspective.
+While many idea of the algorithm is simple, it is beneficial to get a line-by-line perspective.
 
-* In line 1 two variables are initilized, turn and waiting.
+* In line 1, two variables are initialized: turn and waiting.
 
-    * turn is a boolean, or more precisely a binary integer as it is used in the algorithm, that determines which processes turn it is to enter the critical section. When turn = 0, it is p_0's turn and vice versa.
-    * waiting is a boolean array with length 2 that determines if a process is waiting to enter the critical section or not. 
+    * turn is a boolean, or more precisely a binary integer, as it is used in the algorithm to determine which processes turn it is to enter the critical section. When turn = 0, it is p_0's turn and vice versa.
+    * waiting is a boolean array with length two that determines if a process is waiting to enter the critical section or not. 
 
 * In line 3, it is checked that if a process wants to enter the critical section. If not, no action needs to be taken.
 * In line 4, the process establishes that it is waiting to enter the critical section
 * In line 5, the process gives way to the other process.
-* In lines 7-8, the process waits until either it is its turn to enter the critical section, or the other process does not have any intention of entering the critical section at the time. When either one of this consitions are met, it proceeds.
+* In lines 7-8, the process waits until either it is its turn to enter the critical section or the other process does not have any intention of entering the critical section at the time. When either one of these conditions is met, it proceeds.
 * In lines 10-12, the process does whatever it needs to do in the critical section.
-* In line 14, the process establishes that its work with the critical section is done and it is no longer waiting to access the critical section.
+* In line 14, the process establishes that its work with the critical section is done, and it is no longer waiting to access the critical section.
 
 Bakery Algorithm
 """"""""""""""""""""""""
@@ -91,19 +89,19 @@ Bakery :ref:`Algorithm <BakeryAlgorithm>` [Lamport1974]_ simulates the activity 
 			
         end if
 		
-The slight complexity of the algorithm when compared with the Peterson's :ref:`Algorithm <PetersonsAlgorithm>`, which enables the Bakery Algorithm to serve any number of processes (n processes, identified by p_i, i in [1, n]), warrants a closer examination of the psuedocode.
+The slight complexity of the algorithm when compared with the Peterson's :ref:`Algorithm <PetersonsAlgorithm>`, which enables the Bakery Algorithm to serve any number of processes (n processes, identified by p_i, i in [1, n]), warrants a closer examination of the pseudocode.
 
-* In line 1, entering is initilized. It is a boolean array with length n. It determines whether a process is trying to get a ticket at that timeframe or not.
-* In line 2, tickes is initilized. It is a integer array with length n. It determines the number on a process' ticket.
+* In line 1, entering is initialized. It is a boolean array with length n. It determines whether a process is trying to get a ticket in that timeframe or not.
+* In line 2, the tickets array is initialized. It is an integer array with length n. It records the number on a process' ticket.
 * In line 4, it is checked that if a process wants to enter the critical section. If not, no action needs to be taken.
-* In lines 5-7, the process takes a ticket whose number comes after all processes that are currently waiting to enter the critical section, as it arrived later then them.
+* In lines 5-7, the process takes a ticket whose number comes after all processes that are currently waiting to enter the critical section, as it arrived later than them.
 * In lines 9-14, the process waits,
 
-    * if any process is currently trying to get a ticket, as tickets taken within close proximity of eachother might have the same number on them due to context switches between read and write operations (lines 10-11).
+    * if any process is currently trying to get a ticket, as tickets taken within close proximity of each other might have the same number on them due to context switches between read and write operations (lines 10-11).
     * if any process with a lower number on its ticket or a more senior process with the same number on its ticket is also waiting to enter the critical section (lines 12-13).
 
 * In lines 16-18, the process does whatever it needs to do in the critical section.
-* In line 20, the processes get rid of its ticket, allowing processes with tickets containing greater numbers to also get into the critical section.
+* In line 20, the processes get rid of their ticket, allowing processes with tickets containing greater numbers to also get into the critical section.
 
 Example
 ~~~~~~~~
