@@ -13,5 +13,5 @@ Optimizing all of the preferred criteria at the same time, even with the absence
 
 Our primary contributions consist of the following:
     
-    - Implementation of both the Peterson's Algorithm and Bakery Algorithm on the AHCv2 platform. The implementation specifics are detailed in Section XX.
-    - Examination of the performance of these algorithms across diverse topologies and usage scenarios. Results from these investigations are outlined in Section XXX.
+    - Implementation of both the Peterson's Algorithm and Bakery Algorithm on the AHCv2 platform. The implementation specifics are detailed in Section 1.3.
+    - Examination of the performance of these algorithms across diverse topologies and usage scenarios. Results from these investigations are outlined in Section 1.4.

@@ -54,7 +54,7 @@
 %}
 
 \title[WINS Beamer Template]{Implementing Mutual Exclusion in Shared Memory}
-\subtitle[Short SubTitle]{Peterson's and Bakery Algorithma}
+\subtitle[Short SubTitle]{Peterson's and Bakery Algorithm}
 %\date{} 
 
 \begin{document}
@@ -97,28 +97,25 @@
 %\end{frame}
 
 \begin{frame}{The problem}
-\framesubtitle{Tell a \alert{STORY} from the background to the conclusion}
-\begin{block}{The Problem Name} 
-Explain the problem here. Instead of using the term `The problem'', please use specific name for the problem. Tell us a story. Provide a picture for the scenario depicting the problem. Set the scene for average audience.
+\begin{block}{Race Conditions} 
+Race conditions occur in concurrent systems when the outcome of a process depends on the timing or sequence of other events. This can lead to unpredictable behavior, data corruption, or system failures. Detecting and preventing race conditions is essential for ensuring the correctness and reliability of concurrent software systems.
 \end{block}
-Spend at least \textbf{1.5-2 minutes per slide} on average.
-
-The introduction should be something like ``I will be presenting title of talk. This is joint work with your colleagues or advisor at institution.'' 
 \note{}
 \end{frame}
 
 \section{The Contribution}
 \begin{frame}
-\frametitle{What is the solution/contribution}
+\frametitle{Mutual Exclusion}
 \framesubtitle{}
-Explain \textbf{YOUR} contributions. Go top-down. Give the brief introduction to the contributions at the beginning of the presentation. A slide should have no more than five to six lines of text or bullets. Prefer figures instead of text: A picture is worth a thousand words.
+Mutual exclusion is the most common solution for race conditions in terms of mutual memory. 
+\vspace{0.2in}
 \begin{itemize}
-\item Communicate the Key Ideas
-\item Don’t get Bogged Down in Details
-\item Use a Top-down Approach
+\item SharedExclusion
+\begin{itemize}
+	\item Peterson's Algorithm
+	\item Bakery Algorithm
 \end{itemize}
-
-The audience will remember at most one single message \textbf{Which message you want to audience to remember? Can you express this message in less than a minute in an elevator?}
+\end{itemize}
 
 \end{frame}
 
@@ -126,28 +123,30 @@ The audience will remember at most one single message \textbf{Which message you 
 \section{Motivation/Importance}
 \begin{frame}
 \frametitle{Motivation/Importance}
-\framesubtitle{``Gain upon solving the problem, pain if not solved'' should be explained}
 Disturbed systems with many process, while working on the same data, it is common for many processes to want to access or modify it at the same time. But a process changing the data while the other is reading it might create unwanted effects. Mutual exclusion is a common way of handling these effects. This enables multiple processes to work on the same piece of data, which is one of the most fundamental capabilities requested from a distributed system.
 \end{frame}
 
-\section{Background/Model/Definitions/Previous Works}
-
-
-\subsection{Model, Definitions}
+\section{Definitions/Background}
 
 \frame{
-\frametitle{Model, Definitions}
-\framesubtitle{Formal definition of a Stochastic Process}
-When a process wants to modify a piece of data that is being accessed by others, it creates a \textbf{race condition}. 
+\frametitle{Definitions}
 
-Regions of code that modifies the shared memory, meaning regions that might cause race conditions are called the \textbf{critical section}.
-
-\textbf{Mutual exclusion} is the methodology of allowing only a single process to enter a critical section at a time.
+\begin{itemize}
+\item When a process wants to modify a piece of data that is being accessed by others, it creates a \textbf{race condition}. 
+\item Regions of code that modifies the shared memory, meaning regions that might cause race conditions are called the \textbf{critical section}.
+\item \textbf{Mutual exclusion} is the methodology of allowing only a single process to enter a critical section at a time.
+\end{itemize}
 }
 
-\subsection{Background, Previous Works}
 \begin{frame}{Background}
-Research is not usually carried out in a vacuum. There will almost always be other relevant or related work, which you should describe. Present an orderly synopsis of these previously- obtained results. A table is often used for this purpose. Be sure to mention the author of each paper and its date of publication. \textbf{Compare and contrast them with each other and with your paper.}
+My comparisons are limited to the contemporaries of my algorithms.
+\begin{itemize}
+	\item Dijkstra (1965) \cite{Dijkstra_1965}
+	\item Knuth (1966) \cite{Knuth_1966}
+	\item de Bruijn (1967) \cite{deBruijn_1967}
+	\item Dijkstra (1968) \cite{Dijkstra_1968}
+	\item Eisenberg and McGuire (1972) \cite{Eisenberg_McGuire_1972}
+\end{itemize}
 \end{frame}
 
 
@@ -230,75 +229,61 @@ Bakery Algorithm \cite{Lamport_1974} simulates the activity of waiting in a line
 \end{algorithm}
 \end{frame}
 
+\subsection{Implementation Details}
 \begin{frame}
-\frametitle{Main Point 2}
-\framesubtitle{Explain the Significance of the Results}
-Pause, and explain the relationships between the formal theorems that you have just presented and the informal description that you gave in the Introduction. Make it clear to the audience that the results do live up to the advance publicity. If the statements of the theorems are very technical then this may take some time. It is time well-spent.
-
-\end{frame}
-
-\subsection{Main Point 3}
-\begin{frame}
-\frametitle{Main Point 3}
-\framesubtitle{Sketch a Proof of the Crucial Results}
-The emphasis is on the word ``sketch''. Give a very high-level description of the proofs, emphasizing the proof structure and the proof techniques used. If the proofs have no structure (in which case it may be assumed that you are not the author of the paper), then you must impose one on them. Gloss over the technical details. It is a good idea to point them out but not to explore them.
-\end{frame}
-
-
-\section{Experimental results/Proofs}
-
-\subsection{Main Result 1}
-\begin{frame}
-\frametitle{Main Result 1}
-\framesubtitle{}
-Choose \textbf{just the key results}. They should be important, non-trivial, should give the flavour of the rest of the technical details and should be presentable in a relatively short period of time. Use figures instead of tables instead of text.
-
-Better to present 10\% the entire audience gets than 90\% nobody gets
-\end{frame}
-
-
-\subsection{Main Result 2}
-\begin{frame}
-\frametitle{Main Result 2}
-\framesubtitle{Try a subtitle}
+\frametitle{Implementation Details}
+\framesubtitle{ }
 \begin{itemize}
-\item Make sure your notation is clear and consistent throughout the talk. Prepare a slide that explains the notation in detail, in case that is needed or if somebody asks.
-\item Always label all of your axes on graphs; use short but helpful captions on figures and tables. It is also very useful to have an arrow on the side which clearly shows which direction is considered better (e.g., "up is better").
-\item If you have experimental results, make sure you clearly present the experimental paradigm you used, and the details of your methods, including the number of trials, the specific analysis tools you applied, significance testing, etc.
-\item The talk should contain at least a brief discussion of the limitations and weaknesses of the presented approach or results, in addition to their strengths. This, however, should be done in an objective manner -- don't enthusiastically put down your own work.
+	\item Central vs Distributed Implementation.
+	\item Non-event driven initialization.
+	\item Leader election.
 \end{itemize}
 \end{frame}
 
 
-\subsection{Main Result 3}
+\section{Results}
+
+\subsection{Testing}
 \begin{frame}
-\frametitle{Main Result 3}
+\frametitle{Testing}
 \framesubtitle{}
 \begin{itemize}
-\item If time allows, the results should be compared to the most related work in the field. You should at least prepare one slide with a summary of the related work, even if you do not get a chance to discuss it. This will be helpful if someone asks about it, and will demonstrate your mastery of the material.
-\item Spell check again.
-\item Give for each of the x-axis, y-axis, and z-axis
-\item Label, unit, scale (if log scale)
-\item Give the legend
-\item Explain all symbols
-\item Take an example to illustrate a specific point in the figure
+	\item Peterson's Algorithm
+		\begin{itemize}
+			 \item Topology with two nodes.
+		\end{itemize}
+	\item Bakery Algorithm
+		\begin{itemize}
+			\item Well-connected topologies ($O(n^2)$ connections)
+			\item Topologies where only connections are between the leader and others.
+			\item Two directional ring topologies without shortcuts.
+			\item One-directional ring topologies without shortcuts.
+		\end{itemize}
 \end{itemize}
 \end{frame}
 
+\subsection{Future Work}
+\begin{frame}
+\frametitle{Future Work}
+\framesubtitle{}
 
+\begin{itemize}
+	\item Increase the event drivenness of the current implementation.
+	\item Implement distributed versions of the algorithms and compare them to current implementations.
+\end{itemize}
+
+\end{frame}
 
 \section{Conclusions}
 \begin{frame}
 \frametitle{Conclusions}
-\framesubtitle{Hindsight is Clearer than Foresight}
-Advices come from \cite{spillman2000present}.
+\framesubtitle{What was achieved?}
 \begin{itemize}
-\item You can now make observations that would have been confusing if they were introduced earlier. Use this opportunity to refer to statements that you have made in the previous three sections and weave them into a coherent synopsis. You will regain the attention of the non- experts, who probably didn’t follow all of the Technicalities section. Leave them feeling that they have learned something nonetheless.
-\item Give Open Problems It is traditional to end with a list of open problems that arise from your paper. Mention weaknesses of your paper, possible generalizations, and indications of whether they will be fruitful or not. This way you may defuse antagonistic questions during question time.
-\item Indicate that your Talk is Over
-An acceptable way to do this is to say “Thank-you. Are there any questions?”\cite{einstein}
+	\item We learned about mutual exclusion.
+	\item Functional (but not at full potential) algorithms were added to the AHCv2 platform.
+	\item I gained experience in event-driven and distributed computing.
 \end{itemize}
-
+	
 \end{frame}
 
 \section*{References}
@@ -308,30 +293,6 @@ An acceptable way to do this is to say “Thank-you. Are there any questions?”
 \bibliography{refs}
 \end{frame}
 
-\begin{frame}{How to prepare the talk?}
-Please read \url{http://larc.unt.edu/ian/pubs/speaker.pdf}
-\begin{itemize}
-\item The Introduction:  Define the Problem,    Motivate the Audience,    Introduce Terminology,    Discuss Earlier Work,    Emphasize the Contributions of your Paper,    Provide a Road-map.
-\item The Body:    Abstract the Major Results, Explain the Significance of the Results, Sketch a Proof of the Crucial Results
-\item Technicalities: Present a Key Lemma, Present it Carefully
-\item The Conclusion: Hindsight is Clearer than Foresight, Give Open Problems, Indicate that your Talk is Over
-\end{itemize}
-
-\note{
-\begin{itemize}
-\item The Introduction:  Define the Problem,    Motivate the Audience,    Introduce Terminology,    Discuss Earlier Work,    Emphasize the Contributions of your Paper,    Provide a Road-map.
-\item The Body:    Abstract the Major Results, Explain the Significance of the Results, Sketch a Proof of the Crucial Results
-\item Technicalities: Present a Key Lemma, Present it Carefully
-\item The Conclusion: Hindsight is Clearer than Foresight, Give Open Problems, Indicate that your Talk is Over 
-\end{itemize}
-}
-\end{frame}
-
-
-
 \thankslide
-
-
-
 
 \end{document}

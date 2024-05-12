@@ -6,11 +6,7 @@ Implementation, Results and Discussion
 Implementation and Methodology
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Both Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ and Bakery :ref:`Algorithm <BakeryAlgorithm>` [Lamport1974]_ use central registers for the decision of which process is supposed to move forwards (turn and waiting for Peterson's Algorithm, entring and ticket for Bakery Algorithm, see Section XX for more details). Because of the following reasons, I gave the management responsibility of these registers to a single centralized entity instead of giving several entities shared access to them:
-
-1. Accessing or modifying data across a topology in a distributed system might have significant latency problems.
-
-2. These algorithms are already trying to resolve the problem of managing a shared memory; because of this, their implementation should not produce the same problem recursively.
+Both Peterson's :ref:`Algorithm <PetersonsAlgorithm>` [Peterson1981]_ and Bakery :ref:`Algorithm <BakeryAlgorithm>` [Lamport1974]_ use central registers for the decision of which process is supposed to move forwards (turn and waiting for Peterson's Algorithm, entring and ticket for Bakery Algorithm, see Section XX for more details). Because of accessing or modifying data across a topology in a distributed system might have significant latency problems, and due to my lack of experience with distributed systems, I gave the management responsibility of these registers to a single centralized entity instead of giving several entities shared access to them, resembling their implementations for single processor systems. While this eleminates their main improvements to the field and reduce their failure proofness, it improves the messaging complexity of the Bakery Algorithm from O(n) to O(1).
 
 This decision created a need for another decision to be made: what should be the nature of this central entity? Specifically, should it be a separate kind of entity or one of the entities that have access to the shared memory? To minimize the number of entities in the topology, I decided that it should be one of the processes that also wish to enter the critical section. However, this also creates several system limitations.
 
@@ -28,32 +24,13 @@ These limitations are the main problems with the current implementations of the 
 Results
 ~~~~~~~~
 
-Present your AHCv2 run results, plot figures.
+I tested my implementation of the Peterson's Algorithm, but because of its limited nature, it does not lend itself to different kinds of setups.
 
+For my implementation of the Bakery Algorithm, I tested it for
+1. Well-connected topologies ($O(n^2)$ connections)
+2. Topologies where only connections are between the leader and others.
+3. Two directional ring topologies without shortcuts.
+4. One-directional ring topologies without shortcuts.
 
-This is probably the most variable part of any research paper, and depends upon the results and aims of the experiment. For quantitative research, it is a presentation of the numerical results and data, whereas for qualitative research it should be a broader discussion of trends, without going into too much detail. For research generating a lot of results, then it is better to include tables or graphs of the analyzed data and leave the raw data in the appendix, so that a researcher can follow up and check your calculations. A commentary is essential to linking the results together, rather than displaying isolated and unconnected charts, figures and findings. It can be quite difficulty to find a good balance between the results and the discussion section, because some findings, especially in a quantitative or descriptive experiment, will fall into a grey area. As long as you not repeat yourself to often, then there should be no major problem. It is best to try to find a middle course, where you give a general overview of the data and then expand upon it in the discussion - you should try to keep your own opinions and interpretations out of the results section, saving that for the discussion.
+However, due to the topology-independent nature of the algorithm as well as the details of my implementation, those only tested the robustness of my forwarding. I was unable to test the failure resistance of the algorithms as my implementation was lacking on that front. If implemented in the future, testing my implementations against more faithful incarnations of the same algorithms could result in more interesting results. Due to these, I was unable to produce a quantitative experiment. But I tested that both implementations actually work.
 
-
-.. image:: figures/CDFInterferecePowerFromKthNode2.png
-  :width: 400
-  :alt: Impact of interference power
-
-
-.. list-table:: Title
-   :widths: 25 25 50
-   :header-rows: 1
-
-   * - Heading row 1, column 1
-     - Heading row 1, column 2
-     - Heading row 1, column 3
-   * - Row 1, column 1
-     -
-     - Row 1, column 3
-   * - Row 2, column 1
-     - Row 2, column 2
-     - Row 2, column 3
-
-Discussion
-~~~~~~~~~~
-
-Present and discuss main learning points.

@@ -21,6 +21,41 @@
 \providecommand{\BIBdecl}{\relax}
 \BIBdecl
 
+\bibitem{Dijkstra_1965}
+\BIBentryALTinterwordspacing
+E.~W. Dijkstra, ``Solution of a problem in concurrent programming control,''
+  \emph{Commun. ACM}, vol.~8, no.~9, p. 569, sep 1965. [Online]. Available:
+  \url{https://doi.org/10.1145/365559.365617}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Knuth_1966}
+\BIBentryALTinterwordspacing
+D.~E. Knuth, ``Additional comments on a problem in concurrent programming
+  control,'' \emph{Commun. ACM}, vol.~9, no.~5, p. 321–322, may 1966.
+  [Online]. Available: \url{https://doi.org/10.1145/355592.365595}
+\BIBentrySTDinterwordspacing
+
+\bibitem{deBruijn_1967}
+\BIBentryALTinterwordspacing
+N.~G. de~Bruijn, ``Additional comments on a problem in concurrent programming
+  control,'' \emph{Commun. ACM}, vol.~10, no.~3, p. 137–138, mar 1967.
+  [Online]. Available: \url{https://doi.org/10.1145/363162.363167}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Dijkstra_1968}
+\BIBentryALTinterwordspacing
+E.~W. Dijkstra, ``The structure of the “the”-multiprogramming system,''
+  \emph{Commun. ACM}, vol.~11, no.~5, p. 341–346, may 1968. [Online].
+  Available: \url{https://doi.org/10.1145/363095.363143}
+\BIBentrySTDinterwordspacing
+
+\bibitem{Eisenberg_McGuire_1972}
+\BIBentryALTinterwordspacing
+M.~A. Eisenberg and M.~R. McGuire, ``Further comments on dijkstra's concurrent
+  programming control problem,'' \emph{Commun. ACM}, vol.~15, no.~11, p. 999,
+  nov 1972. [Online]. Available: \url{https://doi.org/10.1145/355606.361895}
+\BIBentrySTDinterwordspacing
+
 \bibitem{Peterson_1981}
 G.~Peterson, ``Myths about the mutual exclusion problem,'' \emph{Information
   Processing Letters}, vol.~12, no.~3, p. 115–116, Jun 1981.
@@ -28,14 +63,5 @@ G.~Peterson, ``Myths about the mutual exclusion problem,'' \emph{Information
 \bibitem{Lamport_1974}
 L.~Lamport, ``A new solution of dijkstra’s concurrent programming problem,''
   \emph{Communications of the ACM}, vol.~17, no.~8, p. 453–455, Aug 1974.
-
-\bibitem{spillman2000present}
-B.~Spillman and I.~Parberry, ``How to present a paper: A speaker's guide,''
-  \emph{North American Membrane Society}, 2000.
-
-\bibitem{einstein}
-A.~Einstein, ``{Zur Elektrodynamik bewegter K{\"o}rper}. ({German}) [{On} the
-  electrodynamics of moving bodies],'' \emph{Annalen der Physik}, vol. 322,
-  no.~10, pp. 891--921, 1905.
 
 \end{thebibliography}
